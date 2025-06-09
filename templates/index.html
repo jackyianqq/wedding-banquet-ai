@@ -1,0 +1,18 @@
+
+<!doctype html>
+<html>
+<head>
+    <title>Wedding Banquet Recommender</title>
+</head>
+<body>
+    <h1>Find Your Perfect Banquet Venue 💍</h1>
+    <form method="POST">
+        <textarea name="user_input" rows="5" cols="50" placeholder="Describe your wedding needs..."></textarea><br>
+        <input type="submit" value="Get Recommendation">
+    </form>
+    {% if result %}
+        <h2>Recommendation:</h2>
+        <pre>{{ result }}</pre>
+    {% endif %}
+</body>
+</html>

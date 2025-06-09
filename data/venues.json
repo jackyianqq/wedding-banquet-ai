@@ -1,0 +1,21 @@
+
+[
+    {
+        "venue": "Hotel A",
+        "location": "Orchard",
+        "price_per_table": 1288,
+        "capacity": 200
+    },
+    {
+        "venue": "Ballroom B",
+        "location": "Sentosa",
+        "price_per_table": 1500,
+        "capacity": 250
+    },
+    {
+        "venue": "Restaurant C",
+        "location": "Bugis",
+        "price_per_table": 988,
+        "capacity": 120
+    }
+]
