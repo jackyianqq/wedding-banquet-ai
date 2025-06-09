@@ -1,35 +1,52 @@
 import os
 import json
-from flask import Flask, render_template, request
+import subprocess
+from flask import Flask, request, render_template, redirect, url_for, flash
 from app.recommender import recommend_venues
 
-# Set template folder correctly
-template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'templates')
-app = Flask(__name__, template_folder=template_dir)
+# Set the correct template folder location
+base_dir = os.path.abspath(os.path.dirname(__file__))
+parent_dir = os.path.abspath(os.path.join(base_dir, '..'))
+template_dir = os.path.join(parent_dir, 'templates')
+data_dir = os.path.join(parent_dir, 'data')
 
-# Load venues data
-with open("data/venues.json", "r") as f:
+app = Flask(__name__, template_folder=template_dir)
+app.secret_key = 'wedding-secret-key'
+
+# Load venues data initially
+with open(os.path.join(data_dir, 'venues.json'), 'r', encoding='utf-8') as f:
     venue_data = json.load(f)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route('/', methods=['GET', 'POST'])
 def index():
     recommendations = []
+    if request.method == 'POST':
+        user_input = request.form['user_input']
+        location = request.form.get('location', '')
+        budget = request.form.get('budget', '')
 
-    if request.method == "POST":
-        user_input = request.form.get("user_input", "")
-        location = request.form.get("location", "")
-        budget = request.form.get("budget", "")
-
-        filters = []
+        filtered_data = venue_data
         if location:
-            filters.append(f"Preferred location: {location}")
+            filtered_data = [v for v in filtered_data if location.lower() in v['location'].lower()]
         if budget:
-            filters.append(f"Max budget per table: ${budget}")
+            try:
+                budget_value = int(budget)
+                filtered_data = [v for v in filtered_data if v['price_per_table'] <= budget_value]
+            except ValueError:
+                pass
 
-        full_prompt = f"{user_input}\n" + "\n".join(filters)
-        recommendations = recommend_venues(full_prompt, venue_data)
+        recommendations = recommend_venues(user_input, filtered_data)
 
     return render_template("index.html", recommendations=recommendations, results=bool(recommendations))
 
-if __name__ == "__main__":
+@app.route('/update_venues', methods=['POST'])
+def update_venues():
+    try:
+        subprocess.run(['python3', os.path.join(parent_dir, 'scripts', 'update_venues.py')], check=True)
+        flash('✅ Venues successfully updated!')
+    except subprocess.CalledProcessError:
+        flash('❌ Failed to update venues.')
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
     app.run(debug=True)
