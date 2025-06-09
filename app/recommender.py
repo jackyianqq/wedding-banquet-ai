@@ -2,10 +2,12 @@ import os
 import openai
 import json
 
+
 # Initialize OpenAI client with API key from environment variable
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def recommend_venues(user_input, venue_data):
+
     prompt = f"""
 You are a helpful wedding planner AI. Based on the user's request and the banquet venue data, recommend 3 suitable wedding banquet venues.
 
@@ -40,6 +42,7 @@ Only return the JSON array:
             ]
         )
 
+
         response_text = response.choices[0].message.content.strip()
 
         # Strip Markdown-style code block if GPT wraps response in ```json ... ```
@@ -48,9 +51,11 @@ Only return the JSON array:
             lines = response_text.splitlines()
             response_text = "\n".join(line for line in lines if not line.strip().startswith("json"))
 
+
         print("=== GPT RAW RESPONSE ===")
         print(response_text)
         print("========================")
+
 
         return json.loads(response_text)
 

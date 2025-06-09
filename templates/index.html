@@ -4,60 +4,78 @@
     <meta charset="utf-8">
     <title>Wedding Banquet Recommender 💍</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Open+Sans&display=swap');
+
         body {
-            font-family: 'Helvetica Neue', sans-serif;
-            background: #fdfdfd;
-            color: #333;
+            font-family: 'Open Sans', sans-serif;
+            background: #fff9f9;
+            color: #444;
             padding: 30px;
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
+            background-image: url('https://www.blissfulbrides.sg/images/bg-floral.png');
+            background-repeat: no-repeat;
+            background-position: top right;
+            background-size: contain;
         }
 
         h1 {
-            color: #d95f76;
+            font-family: 'Playfair Display', serif;
+            color: #b46978;
             text-align: center;
+            font-size: 2.4em;
             margin-bottom: 20px;
         }
 
         label {
             font-weight: bold;
+            color: #5a5a5a;
         }
 
-        select, textarea, input[type="submit"] {
+        select, textarea, input[type="submit"], .update-button {
             width: 100%;
             padding: 12px;
             font-size: 16px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
+            margin: 10px 0 20px;
+            border: 1px solid #ddd;
             border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        input[type="submit"] {
-            background-color: #d95f76;
+        input[type="submit"], .update-button {
+            background-color: #b46978;
             color: white;
             border: none;
             cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
         }
 
-        input[type="submit"]:hover {
-            background-color: #c64e66;
+        input[type="submit"]:hover, .update-button:hover {
+            background-color: #a05668;
         }
 
         .result {
-            background: #f1f1f1;
+            background: #fff;
             border-radius: 10px;
-            padding: 20px;
+            padding: 25px;
             margin-top: 30px;
             white-space: pre-wrap;
-            border-left: 5px solid #d95f76;
+            border-left: 5px solid #b46978;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .venue-box {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #fffdfd;
+            border: 1px solid #eee;
+            border-radius: 10px;
+        }
+
+        .venue-box h3 {
+            color: #9c4b5e;
+            margin-top: 0;
         }
 
         #loading {
@@ -68,7 +86,7 @@
 
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #d95f76;
+            border-top: 4px solid #b46978;
             border-radius: 50%;
             width: 30px;
             height: 30px;
@@ -80,30 +98,47 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .flash-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .flash-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .flash-error {
+            background-color: #fdecea;
+            color: #c62828;
+        }
     </style>
 </head>
 <body>
     <h1>💒 Find Your Perfect Banquet Venue</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ 'flash-success' if category == 'success' else 'flash-error' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- 🔄 Update Venues Button -->
+    <form method="POST" action="/update_venues">
+        <button type="submit" class="update-button">🔄 Update Venues</button>
+    </form>
+
+    <!-- 📝 Recommendation Form -->
     <form method="POST" onsubmit="showLoading()">
-        <label for="user_input">Describe anything special:</label>
-        <textarea name="user_input" placeholder="E.g. Traditional Chinese setting or halal food" required>{{ request.form.user_input or '' }}</textarea>
-
-        <label for="location">Preferred Location:</label>
-        <select name="location">
-            <option value="">Any</option>
-            <option value="Orchard" {% if request.form.location == 'Orchard' %}selected{% endif %}>Orchard</option>
-            <option value="Sentosa" {% if request.form.location == 'Sentosa' %}selected{% endif %}>Sentosa</option>
-            <option value="Bugis" {% if request.form.location == 'Bugis' %}selected{% endif %}>Bugis</option>
-        </select>
-
-        <label for="budget">Maximum Budget (per table):</label>
-        <select name="budget">
-            <option value="">Any</option>
-            <option value="1000" {% if request.form.budget == '1000' %}selected{% endif %}>$1,000</option>
-            <option value="1200" {% if request.form.budget == '1200' %}selected{% endif %}>$1,200</option>
-            <option value="1500" {% if request.form.budget == '1500' %}selected{% endif %}>$1,500</option>
-        </select>
-
+        <label for="user_input">Describe your preferences:</label>
+        <textarea name="user_input" placeholder="E.g. Budget $1000, looking for 50 tables; each table holds 10 people. Falls on weekends" required></textarea>
         <input type="submit" value="Get Recommendation">
     </form>
 

@@ -1,3 +1,11 @@
+
+
+import json
+
+def load_data():
+    with open("data/venues.json", "r") as f:
+        return json.load(f)
+
 import os
 import json
 import requests
@@ -66,3 +74,4 @@ def load_data():
             return data
         except json.JSONDecodeError:
             return scrape_and_save()
+
