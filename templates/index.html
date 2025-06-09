@@ -1,26 +1,8 @@
-<<<<<<< HEAD
-
-<!doctype html>
-<html>
-<head>
-    <title>Wedding Banquet Recommender</title>
-</head>
-<body>
-    <h1>Find Your Perfect Banquet Venue �</h1>
-    <form method="POST">
-        <textarea name="user_input" rows="5" cols="50" placeholder="Describe your wedding needs..."></textarea><br>
-        <input type="submit" value="Get Recommendation">
-    </form>
-    {% if result %}
-        <h2>Recommendation:</h2>
-        <pre>{{ result }}</pre>
-    {% endif %}
-=======
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Wedding Banquet Recommender �</title>
+    <title>Wedding Banquet Recommender 💍</title>
     <style>
         body {
             font-family: 'Helvetica Neue', sans-serif;
@@ -101,7 +83,7 @@
     </style>
 </head>
 <body>
-    <h1>� Find Your Perfect Banquet Venue</h1>
+    <h1>💒 Find Your Perfect Banquet Venue</h1>
     <form method="POST" onsubmit="showLoading()">
         <label for="user_input">Describe anything special:</label>
         <textarea name="user_input" placeholder="E.g. Traditional Chinese setting or halal food" required>{{ request.form.user_input or '' }}</textarea>
@@ -132,14 +114,14 @@
 
     {% if results %}
     <div class="result">
-        <h2>Recommended Venues ��</h2>
+        <h2>Recommended Venues 💡</h2>
         {% for venue in recommendations %}
         <div class="venue-box">
             <h3>{{ venue.venue }}</h3>
-            <p>� Location: {{ venue.location }}</p>
-            <p>�� Price per Table: ${{ venue.price_per_table }}</p>
-            <p>�� Capacity: {{ venue.capacity }}</p>
-            <p>�� {{ venue.reason }}</p>
+            <p>📍 Location: {{ venue.location }}</p>
+            <p>💰 Price per Table: ${{ venue.price_per_table }}</p>
+            <p>👥 Capacity: {{ venue.capacity }}</p>
+            <p>💬 {{ venue.reason }}</p>
         </div>
         {% endfor %}
     </div>
@@ -150,6 +132,5 @@
             document.getElementById("loading").style.display = "block";
         }
     </script>
->>>>>>> 8540f75 (Update: working recommender system with JSON integration)
 </body>
 </html>

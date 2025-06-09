@@ -1,34 +1,12 @@
-<<<<<<< HEAD
-
-import openai
-import os
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-def recommend_venues(user_input, venue_data):
-    prompt = f"""You are a helpful wedding planner AI. Based on the user's request below and the list of venues provided, recommend 3 suitable options with reasons.
-
-User request: {user_input}
-
-Venues data:
-{venue_data}
-
-Your reply:"""
-
-    response = openai.ChatCompletion.create(
-        model="gpt-4o",
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return response["choices"][0]["message"]["content"]
-=======
 import os
 import openai
 import json
 
-# Initialize OpenAI client with API key from environment variable
+# Initialize OpenAI client
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def recommend_venues(user_input, venue_data):
+    # Format prompt to enforce JSON structure
     prompt = f"""
 You are a helpful wedding planner AI. Based on the user's request and the banquet venue data, recommend 3 suitable wedding banquet venues.
 
@@ -63,18 +41,13 @@ Only return the JSON array:
             ]
         )
 
+        # Extract text and print for debugging
         response_text = response.choices[0].message.content.strip()
-
-        # Strip Markdown-style code block if GPT wraps response in ```json ... ```
-        if response_text.startswith("```"):
-            response_text = response_text.strip("`")
-            lines = response_text.splitlines()
-            response_text = "\n".join(line for line in lines if not line.strip().startswith("json"))
-
         print("=== GPT RAW RESPONSE ===")
         print(response_text)
         print("========================")
 
+        # Try to parse response into Python list
         return json.loads(response_text)
 
     except Exception as e:
@@ -86,4 +59,3 @@ Only return the JSON array:
             "capacity": 0,
             "reason": f"Unable to parse GPT output: {str(e)}"
         }]
->>>>>>> 8540f75 (Update: working recommender system with JSON integration)

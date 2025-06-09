@@ -1,55 +1,35 @@
-<<<<<<< HEAD
-
-from flask import Flask, render_template, request
-from app.recommender import recommend_venues
-from app.scraper import load_data
-
-app = Flask(__name__)
-venue_data = load_data()
-
-@app.route("/", methods=["GET", "POST"])
-def index():
-    result = None
-    if request.method == "POST":
-        user_input = request.form["user_input"]
-        result = recommend_venues(user_input, venue_data)
-    return render_template("index.html", result=result)
-=======
 import os
 import json
 from flask import Flask, render_template, request
 from app.recommender import recommend_venues
 
-# Define the template directory before using it
-template_dir = os.path.join(os.path.dirname(__file__), '..', 'templates')
+# Set template folder correctly
+template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'templates')
 app = Flask(__name__, template_folder=template_dir)
 
-# Load venue data from JSON
-def load_venue_data():
-    try:
-        json_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'venues.json')
-        with open(json_path, 'r') as f:
-            return json.load(f)
-    except Exception as e:
-        print("❌ Failed to load venues.json:", e)
-        return []
+# Load venues data
+with open("data/venues.json", "r") as f:
+    venue_data = json.load(f)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     recommendations = []
 
     if request.method == "POST":
-        user_desc = request.form.get("user_input", "")
+        user_input = request.form.get("user_input", "")
         location = request.form.get("location", "")
         budget = request.form.get("budget", "")
 
-        user_input = f"I need a wedding banquet venue in {location or 'Singapore'} for 20 tables (200 guests) on a weekday, with a budget of ${budget or 'any'} per table. {user_desc}"
+        filters = []
+        if location:
+            filters.append(f"Preferred location: {location}")
+        if budget:
+            filters.append(f"Max budget per table: ${budget}")
 
-        venue_data = load_venue_data()
-        recommendations = recommend_venues(user_input, venue_data)
+        full_prompt = f"{user_input}\n" + "\n".join(filters)
+        recommendations = recommend_venues(full_prompt, venue_data)
 
     return render_template("index.html", recommendations=recommendations, results=bool(recommendations))
->>>>>>> 8540f75 (Update: working recommender system with JSON integration)
 
 if __name__ == "__main__":
     app.run(debug=True)
