@@ -1,6 +1,6 @@
-# 💍 Wedding Banquet AI Recommender
+# 💍 Course Project - Recommend Suitable Wedding Banquet
 
-This is a Flask-based AI web app that helps users find suitable wedding banquet venues in Singapore based on guest count, budget, and day of the week. The recommendation engine uses OpenAI GPT to suggest the best-fit venues from a local dataset.
+This project leverages a Large Language Model (LLM) to assist couples in finding the most suitable wedding banquet venues based on their specific needs. The AI system will automatically crawl and extract structured data from Blissful Brides’ Wedding Banquet Price List, including venue names, prices, capacity, and unique features. When a user inputs their preferences—such as budget, number of guests, location, or style—the LLM will analyze the request and generate personalized recommendations from the banquet database. The project demonstrates how LLMs can be combined with web scraping and data filtering to deliver intelligent, real-time, and context-aware recommendations.
 
 ## 🖥️ Features
 
