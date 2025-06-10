@@ -56,15 +56,3 @@ Click the 🔄 Update Venues button on the website to automatically refresh venu
 © 2025 Wedding Banquet AI | Built with ❤️ by Jacky
 
 
----
-
-### ✅ To Use:
-
-1. Save this as a file called `README.md` in your project folder.
-2. Run the following to add and push it:
-
-```bash
-git add README.md
-git commit -m "Add README with setup and usage guide"
-git push
-

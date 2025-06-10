@@ -6,65 +6,55 @@ import json
 # Initialize OpenAI client with API key from environment variable
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+
 def recommend_venues(user_input, venue_data):
+    """
+    Generates venue recommendations using OpenAI's GPT model based on user input and venue dataset.
+    Returns a list of recommended venues as JSON.
+    """
 
-    prompt = f"""
-You are a helpful wedding planner AI. Based on the user's request and the banquet venue data, recommend 3 suitable wedding banquet venues.
-
-Respond ONLY in this valid JSON array format — no extra commentary, no Markdown, and no explanation outside the array:
-
-[
-  {{
-    "venue": "string",        // name of venue
-    "location": "string",     // venue location
-    "price_per_table": number,
-    "capacity": number,
-    "reason": "string"        // reason this venue fits the request
-  }},
-  ...
-]
-
-User Request:
-{user_input}
-
-Available Venues:
-{json.dumps(venue_data, indent=2)}
-
-Only return the JSON array:
-"""
+    # Construct a structured and secure prompt
+    prompt = {
+        "system": (
+            "You are a helpful wedding planner AI. Based on the user's request and the banquet venue data, "
+            "recommend exactly 3 suitable wedding banquet venues.\n\n"
+            "Return ONLY a valid JSON array. Do NOT include any extra text or formatting such as Markdown.\n\n"
+            "Each object in the array should have:\n"
+            "- venue (string)\n"
+            "- location (string)\n"
+            "- price_per_table (number)\n"
+            "- capacity (number)\n"
+            "- reason (string explaining why it matches)\n\n"
+            "Strictly output only the JSON array."
+        ),
+        "user": (
+            f"User Request:\n{user_input}\n\n"
+            f"Available Venues:\n{json.dumps(venue_data, indent=2)}"
+        )
+    }
 
     try:
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "You are a wedding planning assistant that always responds in valid JSON arrays."},
-                {"role": "user", "content": prompt}
-            ]
+                {"role": "system", "content": prompt["system"]},
+                {"role": "user", "content": prompt["user"]}
+            ],
+            temperature=0.7,
+            max_tokens=1000
         )
 
+        # Extract the content of the AI's message
+        content = response.choices[0].message.content.strip()
 
-        response_text = response.choices[0].message.content.strip()
+        # Safely parse and return JSON data
+        return json.loads(content)
 
-        # Strip Markdown-style code block if GPT wraps response in ```json ... ```
-        if response_text.startswith("```"):
-            response_text = response_text.strip("`")
-            lines = response_text.splitlines()
-            response_text = "\n".join(line for line in lines if not line.strip().startswith("json"))
-
-
-        print("=== GPT RAW RESPONSE ===")
-        print(response_text)
-        print("========================")
-
-
-        return json.loads(response_text)
+    except json.JSONDecodeError:
+        print("Error: Response is not valid JSON.")
+        print("Raw response:", content)
+        return []
 
     except Exception as e:
-        print("❌ Error parsing GPT response:", e)
-        return [{
-            "venue": "Error",
-            "location": "-",
-            "price_per_table": 0,
-            "capacity": 0,
-            "reason": f"Unable to parse GPT output: {str(e)}"
-        }]
+        print("Error communicating with OpenAI:", str(e))
+        return []
